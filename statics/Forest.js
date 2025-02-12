@@ -4,11 +4,10 @@ import {Vector3} from 'three';
 
 const forestSize = 10;
 const numTrees = 1;//15;
-const forestZ = 0;
+
 export class Forest {
-    constructor(scene, position, gui) {
+    constructor(scene, position) {
         this.scene = scene;
-        this.gui = gui;
         
         this.obj = new THREE.Object3D();
         if (position) {
@@ -27,13 +26,27 @@ export class Forest {
 
         this.init();
 
-        window.forest = this;
-        gui.add(this,"step")
-        gui.add(this,"tenSteps")
+        globals.forest = this;
+        globals.gui.add(this,"step")
+        globals.gui.add(this,"tenSteps")
+
+        globals.gui.add(this, "reset")
+        globals.gui.add(this, "grow")
 
     }
-    
 
+    reset() {
+        this.ready = false;
+        this.obj.clear();
+        this.obj.add(this.mesh);
+        this.trees = [];
+        this.init();
+    }
+
+    grow() {
+        // TODO - we will keep growing until all branches end at terminal leaves
+    }
+    
     getRandomTrunkPos() {
 
        
@@ -69,9 +82,8 @@ export class Forest {
 
     init() {
         this.scene.add(this.get())
-        // Construct a number of trees
 
-       
+        console.log({numTrees});
         for(let i = 0; i < numTrees; i++) {
 
             let pos = this.getRandomTrunkPos();
@@ -79,14 +91,12 @@ export class Forest {
                 console.log("skipped tree creation: too close");
                 continue;
             }
-            // console.log(pos);
             const tree = new Tree(this, pos);
             this.obj.add(tree.get());
             this.trees.push(tree);
         }
 
         this.ready = true;
-
     }
     
     step() {
