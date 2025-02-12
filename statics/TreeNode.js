@@ -27,7 +27,7 @@ export class TreeNode {
 
         this.mesh.position.copy(treeNodeParams.parentOffset);
         objParent.add(this.mesh)
-        if(nodeParent) {
+        if (nodeParent) {
             nodeParent.assignChild(this);
         }
 
@@ -68,7 +68,7 @@ export class TreeNode {
 
     constructChildren(childParams) {
         
-        if(!this.parent) {
+        if (!this.parent) {
             // Simple vertical shift
             const delta = this.radius + childParams.radius;
             return [new TreeNode(this.get(), this, {
@@ -78,15 +78,15 @@ export class TreeNode {
 
         }
         else {
-            if(childParams.didTerminate(childParams)) {
+            if (childParams.didTerminate(childParams)) {
                 this.terminated = true;
                 return [];
             }
-            else if(childParams.didSplit(childParams)) {
+            else if (childParams.didSplit(childParams)) {
                 console.log("split")
                 return this.constructChildSplits(childParams);
             }
-            else if(childParams.didBranch(childParams)) {
+            else if (childParams.didBranch(childParams)) {
                 console.log("branch")
                 return this.constructChildBranches(childParams);
             }
@@ -110,7 +110,7 @@ export class TreeNode {
         const branches = getRandomPertubations(direction, splitDirectionAxisAngle, numBranches, true, Math.PI/4);
         const leaves = [];
 
-        for(let n = 0; n < branches.length; n++) {
+        for (let n = 0; n < branches.length; n++) {
 
             const desiredMag = this.radius + childParams.radius;
 
@@ -168,7 +168,7 @@ export class TreeNode {
         const numSplits = minSplits + Math.floor(Math.random() * (maxSplits-minSplits))
         direction.normalize();
         const splits = getRandomPertubations(direction, splitDirectionAxisAngle, numSplits, true, Math.PI/4);
-        for(let n = 0; n < splits.length; n++) {
+        for (let n = 0; n < splits.length; n++) {
 
             const desiredMag = this.radius + childParams.radius;
 

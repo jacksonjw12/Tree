@@ -50,8 +50,8 @@ loader.load(
 	}
 );
 
-function init() {
-   
+function init(Ammo) {
+    globals.Ammo = Ammo;
     globals.simulation = new Simulation();
 
     globals.container = document.querySelector( '.container' );
@@ -81,7 +81,7 @@ const sceneParams = {
     showAxis: false
 }
 function initScene() {
-    if(sceneParams.showAxis) {
+    if (sceneParams.showAxis) {
         addAxis(globals.scene, globals.font);
     }
 
@@ -100,11 +100,11 @@ function onWindowResize() {
 
 
 function animate(ellapsedMillis) {
-    if(globals.simulation === undefined) {
+    if (globals.simulation === undefined) {
         return;
     }
 
-    if(globals.lastRenderMillis === undefined) {
+    if (globals.lastRenderMillis === undefined) {
         globals.lastRenderMillis = ellapsedMillis;
     }
     const dt = ellapsedMillis - globals.lastRenderMillis;

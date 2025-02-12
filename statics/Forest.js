@@ -57,22 +57,22 @@ export class Forest {
         const maxAttempts = 10;
         let attempt = 0;
 
-        if(numTrees === 1) {
+        if (numTrees === 1) {
             return new Vector3(0, -bounds - margin/2, 0);
         }
-        while(attempt < maxAttempts) {
+        while (attempt < maxAttempts) {
             attempt++;
             
             const pos = new Vector3(Math.random() * size - bounds, -bounds - margin/2, Math.random() * size - bounds);
             let invalid = false;
-            for(let t = 0; t < this.trees.length; t++) {
+            for (let t = 0; t < this.trees.length; t++) {
                 const dist = pos.distanceTo(this.trees[t].position);
                 if ( dist < minProximity) {
                     invalid = true;
                     break;
                 }
             }
-            if(!invalid) {
+            if (!invalid) {
                 return pos;
             }
 
@@ -84,10 +84,10 @@ export class Forest {
         this.scene.add(this.get())
 
         console.log({numTrees});
-        for(let i = 0; i < numTrees; i++) {
+        for (let i = 0; i < numTrees; i++) {
 
             let pos = this.getRandomTrunkPos();
-            if(pos === undefined) {
+            if (pos === undefined) {
                 console.log("skipped tree creation: too close");
                 continue;
             }
@@ -100,10 +100,10 @@ export class Forest {
     }
     
     step() {
-        if(!this.ready) {
+        if (!this.ready) {
             return false;
         }
-        for(let t = 0; t < this.trees.length; t++) {
+        for (let t = 0; t < this.trees.length; t++) {
             // console.log(this.trees[t])
             this.trees[t].step();
         }
@@ -111,7 +111,7 @@ export class Forest {
     }
 
     tenSteps() {
-        if(!this.ready) {
+        if (!this.ready) {
             return false;
         }
         let i = 0;
