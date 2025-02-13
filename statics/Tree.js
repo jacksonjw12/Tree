@@ -9,19 +9,28 @@ export class Tree {
         this.obj = new THREE.Object3D();
         this.position = initPosition;
        
+        // console.log({initPosition});
         this.obj.position.copy(initPosition);
         
         this.nodes = [];
         this.root = undefined;
 
         this.branches = 1;
+
+        this.color = Math.floor((Math.random() + 0.2)*16777211);
        
+       
+        this.obj.updateMatrixWorld(true);
+        this.worldPosition = new THREE.Vector3();
+        this.obj.getWorldPosition( this.worldPosition );
+        // console.log("treePos", this.worldPosition);
+        
         this.init();
 
 
         this.iteration = 0;
         
-
+        
     }
 
     init() {
@@ -92,7 +101,7 @@ export class Tree {
 
     didSplit(childParams) {
         const r = Math.random();
-        console.log({r}, childParams.radius)
+        // console.log({r}, childParams.radius)
         const did =  r > 1.02 - childParams.radius;
         if(did) {
             this.branches++;
@@ -105,7 +114,7 @@ export class Tree {
     didBranch(childParams) {
         // return false;
         const r = Math.random();
-        console.log({r})
+        // console.log({r})
         const did =  r > 1.02 - childParams.radius;
         if(did) {
             this.branches++;
@@ -116,7 +125,7 @@ export class Tree {
     didTerminate(childParams) {
         if(childParams.radius < 0.2 && this.branches > 2) {
             const r = Math.random();
-            console.log({didTerminate: r})
+            // console.log({didTerminate: r})
             return r > 0.85;
             // return Math.random() > 0.8;
         }

@@ -23,23 +23,40 @@ export class TreeNode {
 
         
         const nodeGeometry = new THREE.SphereGeometry( this.radius, sphereDetail[0], sphereDetail[1] );
-        this.mesh = new THREE.Mesh( nodeGeometry, new THREE.MeshStandardMaterial({wireframe:true}) );
+        this.mesh = new THREE.Mesh( nodeGeometry, new THREE.MeshStandardMaterial({wireframe:true, color: tree.color, emissive: tree.color}) );
 
         this.mesh.position.copy(treeNodeParams.parentOffset);
-        objParent.add(this.mesh)
+        // console.log("this.mesh.position", this.mesh.position, "parentOffset:", treeNodeParams.parentOffset)
+        if(this.parent) {
+            this.mesh.position.add(this.parent.mesh.position.clone());
+        }
+        else {
+            // this.mesh.position.add(this.tree.worldPosition);
+        }
+        //objParent.add(this.mesh)
+        this.tree.get().add(this.mesh);
+        // globals.scene.add(this.mesh);
         if (nodeParent) {
             nodeParent.assignChild(this);
         }
 
         this.worldPosition = new THREE.Vector3(); // create once an reuse it
 
+        tree.obj.updateMatrixWorld(true);
+        this.mesh.updateMatrixWorld(true);
+        this.mesh.updateWorldMatrix(true,true);
+        this.worldPosition = new THREE.Vector3();
+        // this.obj.getWorldPosition( this.worldPosition );
         this.mesh.getWorldPosition( this.worldPosition );
-        console.log({worldPosition: this.worldPosition})
+
         this.initialWorldPosition = this.worldPosition.clone();
+
+        // console.log(this.worldPosition);
 
         let transform = new Ammo.btTransform();
         transform.setIdentity();
         transform.setOrigin( new Ammo.btVector3( this.worldPosition.x, this.worldPosition.y, this.worldPosition.z ) );
+        // console.log(this.worldPosition.y)
         
         let quat = {x: 0, y: 0, z: 0, w: 1};
         transform.setRotation( new Ammo.btQuaternion( quat.x, quat.y, quat.z, quat.w ) );
@@ -55,7 +72,8 @@ export class TreeNode {
         let rbInfo = new Ammo.btRigidBodyConstructionInfo( mass, motionState, colShape, localInertia );
         this.physicsBody = new Ammo.btRigidBody( rbInfo );
 
-        this.physicsBody.setDamping(1,1)
+        const damp = 0.9
+        this.physicsBody.setDamping(damp,damp)
 
         globals.simulation.physicsWorld.addRigidBody( this.physicsBody );
         
@@ -73,8 +91,8 @@ export class TreeNode {
             const delta = this.radius + childParams.radius;
             return [new TreeNode(this.get(), this, {
                         radius: childParams.radius,
-                        parentOffset: new Vector3(0,delta,0)
-                    }, this)]
+                        parentOffset: new Vector3(0,delta,0),
+                    }, this.tree)]
 
         }
         else {
@@ -102,6 +120,7 @@ export class TreeNode {
         const minBranches = 2;
         const maxBranches = 3;
         const direction = this.worldPosition.clone().sub(this.parent.worldPosition)
+        // console.log({direction});
         direction.normalize();
 
         const splitDirectionAxisAngle = Math.PI/4;
@@ -122,7 +141,7 @@ export class TreeNode {
             leaves.push (new TreeNode(this.get(), this, {
                 radius: childParams.radius,
                 parentOffset: branches[n]
-            }, this));
+            }, this.tree));
            
             
         }
@@ -133,6 +152,7 @@ export class TreeNode {
     getSmallOffset(childParams) {
         const smallOffset = Math.PI/16;
         const direction = this.worldPosition.clone().sub(this.parent.worldPosition)
+        // console.log({direction})
         direction.normalize();
 
         const pertubation = getRandomPertubations(direction, smallOffset, 1)[0];
@@ -142,7 +162,7 @@ export class TreeNode {
         return new TreeNode(this.get(), this, {
             radius: childParams.radius,
             parentOffset: pertubation
-        }, this)
+        }, this.tree)
     }
 
     constructChildSplits(childParams) {
@@ -161,7 +181,7 @@ export class TreeNode {
         leaves.push(new TreeNode(this.get(), this, {
             radius: childParams.radius,
             parentOffset: original
-        }, this))
+        }, this.tree))
         
         const splitDirectionAxisAngle = Math.PI/4;
 
@@ -181,7 +201,7 @@ export class TreeNode {
             leaves.push (new TreeNode(this.get(), this, {
                 radius: childParams.radius,
                 parentOffset: splits[n]
-            }, this));
+            }, this.tree));
             
         }
 
@@ -196,10 +216,17 @@ export class TreeNode {
         return this.mesh;
     }
 
+    computeNewWorldPosition() {
+        this.mesh.getWorldPosition( this.worldPosition );
+        // console.log(this.worldPosition.y)
+    }
+
     setWorldPosition(newWorldPosition) {
         newWorldPosition.sub(this.worldPosition);
+        // this.initialWorldPosition.copy(this.worldPosition);
         this.mesh.position.add(newWorldPosition)
         this.mesh.getWorldPosition( this.worldPosition );
+        // this.worldPosition.copy(newWorldPosition);
     }
 
     getPhysicsBody() {

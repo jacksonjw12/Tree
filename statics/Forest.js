@@ -3,7 +3,7 @@ import {Tree} from './Tree.js';
 import {Vector3} from 'three';
 
 const forestSize = 10;
-const numTrees = 1;//15;
+const numTrees = 3;//15;
 
 export class Forest {
     constructor(scene, position) {
@@ -23,6 +23,10 @@ export class Forest {
         this.ready = false;
 
         this.trees = [];
+
+        this.obj.updateMatrixWorld(true);
+        this.worldPosition = new THREE.Vector3();
+        this.obj.getWorldPosition( this.worldPosition );
 
         this.init();
 
@@ -121,7 +125,7 @@ export class Forest {
             if (i == 10) {
                 window.clearInterval(interval)
             }
-        }, 100)
+        }, 150)
     }
 
     get() {

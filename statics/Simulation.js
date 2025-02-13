@@ -3,9 +3,9 @@ import {Vector3} from 'three';
 import { convertBulletVectorToThree } from './utils.js';
 
 const springParams = {
-    restingLength: 0.2,
-    springForce: 80,
-    springMax: 200,
+    restingLength: 0.5,
+    springForce: 120,
+    springMax: 400,
 }
 
 function springForce(springCenter, objectPosition) {
@@ -13,7 +13,7 @@ function springForce(springCenter, objectPosition) {
     // console.log(springDirection);
     const len = springDirection.length();
     if(len < springParams.restingLength) {
-        return springDirection.setLength(0);
+        // return springDirection.setLength(0);
     }
     springDirection.setLength(Math.min(springParams.springForce * len, springParams.springMax));
     return springDirection;
@@ -58,7 +58,7 @@ export class Simulation {
         }
         
         // Step world
-        this.physicsWorld.stepSimulation( /** seconds*/deltaMillis / 1000, /**subSteps */ 1 );
+        this.physicsWorld.stepSimulation( /** seconds*/deltaMillis / 1000, /**subSteps */ 10 );
     
         // Update rigid bodies
         for ( let i = 0; i < this.rigidBodies.length; i++ ) {
@@ -77,6 +77,13 @@ export class Simulation {
                 obj.quaternion.set( q.x(), q.y(), q.z(), q.w() );
     
             }
+        }
+
+        // Update worldPosition
+        for ( let i = 0; i < this.rigidBodies.length; i++ ) {
+            let {obj, physicsBody, node} = this.rigidBodies[i];
+            node.computeNewWorldPosition();
+            
         }
     }
 }
